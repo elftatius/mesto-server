@@ -1,14 +1,12 @@
-const path = require('path');
-const fs = require('fs');
-const router = require('express').Router(); // создали роутер
+const router = require('express').Router();
+const {
+  createCard, getCards, deleteCard, likeCard, dislikeCard,
+} = require('../controllers/cards');
 
-router.get('/cards', (req, res) => {
-  try {
-    const cards = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/cards.json')));
-    res.send(cards);
-  } catch (e) {
-    res.status(500).send({ error: 'Ошибка чтения файла' });
-  }
-});
+router.post('/cards', createCard);
+router.get('/cards', getCards);
+router.delete('/cards/:id', deleteCard);
+router.put('/cards/:id/likes', likeCard);
+router.delete('/cards/:id/likes', dislikeCard);
 
-module.exports = router; // экспортировали роутер
+module.exports = router;

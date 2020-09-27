@@ -5,14 +5,27 @@ module.exports.createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные' });
+        return;
+      }
+      res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 
 module.exports.getUser = (req, res) => {
   const { id } = req.params;
   User.findById(id)
+    .orFail(new Error('NotValidId'))
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.message === 'NotValidId') {
+        res.status(404).send({ message: 'Такой пользователь не найден!' });
+        return;
+      }
+      res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 
 module.exports.getUsers = (req, res) => {
@@ -27,8 +40,19 @@ module.exports.updateAvatar = (req, res) => {
     runValidators: true,
     upsert: false,
   })
+    .orFail(new Error('NotValidId'))
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные' });
+        return;
+      }
+      if (err.message === 'NotValidId') {
+        res.status(404).send({ message: 'Такой пользователь не найден!' });
+        return;
+      }
+      res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 
 module.exports.updateProfile = (req, res) => {
@@ -38,6 +62,17 @@ module.exports.updateProfile = (req, res) => {
     runValidators: true,
     upsert: false,
   })
+    .orFail(new Error('NotValidId'))
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные' });
+        return;
+      }
+      if (err.message === 'NotValidId') {
+        res.status(404).send({ message: 'Такой пользователь не найден!' });
+        return;
+      }
+      res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };

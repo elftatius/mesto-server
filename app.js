@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const path = require('path');
 const rateLimit = require('express-rate-limit');
 
 const cardsRouter = require('./routes/cards');
@@ -37,8 +36,6 @@ app.use((req, res, next) => {
 
 app.use('/', usersRouter);
 app.use('/', cardsRouter);
-
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.all('*', (req, res) => {
   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });

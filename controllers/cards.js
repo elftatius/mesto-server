@@ -21,16 +21,24 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
-    .orFail(new Error('NotValidId'))
-    .then((card) => res.send({ data: card }))
-    .catch((err) => {
-      if (err.message === 'NotValidId') {
-        res.status(404).send({ message: 'Такая карточка не найдена!' });
+  Card.findById(req.params.id)
+    .then((card) => {
+      if (card.owner !== req.user._id) {
+        res.status(401).send({ message: 'Карточка принадлежит не вам!' });
         return;
       }
-      res.status(500).send({ message: 'Произошла ошибка' });
-    });
+      Card.findByIdAndRemove(req.params.id)
+        .orFail(new Error('NotValidId'))
+        .then((cardToDelete) => res.send({ data: cardToDelete }))
+        .catch((err) => {
+          if (err.message === 'NotValidId') {
+            res.status(404).send({ message: 'Такая карточка не найдена!' });
+            return;
+          }
+          res.status(500).send({ message: 'Произошла ошибка' });
+        });
+    })
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports.likeCard = (req, res) => {

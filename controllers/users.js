@@ -1,11 +1,18 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
 const User = require('../models/user');
+const { passwordRegex } = require('../utils/regex');
 
 module.exports.createUser = (req, res) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
+
+  if (!passwordRegex.test(password)) {
+    res.status(400).send({ message: 'Переданы некорректные данные' });
+    return;
+  }
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
@@ -15,11 +22,18 @@ module.exports.createUser = (req, res) => {
       email,
       password: hash,
     }))
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      const userToReturn = user.toJSON();
+      delete userToReturn.password;
+      res.send({ data: userToReturn });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
         return;
+      }
+      if (err.name === 'MongoError' && err.code === 11000) {
+        res.status(409).send({ message: 'Такой email занят' });
       }
       res.status(500).send({ message: 'Произошла ошибка' });
     });

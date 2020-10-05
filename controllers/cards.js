@@ -24,7 +24,7 @@ module.exports.deleteCard = (req, res) => {
   Card.findById(req.params.id)
     .then((card) => {
       if (card.owner !== req.user._id) {
-        res.status(401).send({ message: 'Карточка принадлежит не вам!' });
+        res.status(403).send({ message: 'Карточка принадлежит не вам!' });
         return;
       }
       Card.findByIdAndRemove(req.params.id)

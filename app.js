@@ -26,14 +26,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '5f6ca88fb9c8fb2052eb4bd5',
-  };
-
-  next();
-});
-
 app.use('/', usersRouter);
 app.use('/', cardsRouter);
 

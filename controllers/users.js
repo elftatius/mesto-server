@@ -35,7 +35,7 @@ module.exports.createUser = (req, res, next) => {
         throw new ValidationError();
       }
       if (err.name === 'MongoError' && err.code === 11000) {
-        throw new DuplicationError('Такой e-mail уже занят!');
+        throw new DuplicationError('Такой e-mail уже занят.');
       }
     })
     .catch(next);
@@ -43,10 +43,11 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
+  const { NODE_ENV, JWT_SECRET } = process.env;
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
 
       res.send({ token });
     })
@@ -64,7 +65,7 @@ module.exports.getUser = (req, res, next) => {
     .then(
       (user) => {
         if (!user) {
-          throw new NotFoundError('Такой пользователь не найден!');
+          throw new NotFoundError('Такой пользователь не найден.');
         }
         res.send({ data: user });
       },
@@ -87,7 +88,7 @@ module.exports.updateAvatar = (req, res, next) => {
     .then(
       (user) => {
         if (!user) {
-          throw new NotFoundError('Такой пользователь не найден!');
+          throw new NotFoundError('Такой пользователь не найден.');
         }
         res.send({ data: user });
       },
@@ -107,14 +108,15 @@ module.exports.updateProfile = (req, res, next) => {
     runValidators: true,
     upsert: false,
   })
-    .orFail(new Error('NotValidId'))
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Такой пользователь не найден.');
+      }
+      res.send({ data: user });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new ValidationError();
-      }
-      if (err.message === 'NotValidId') {
-        throw new NotFoundError('Такой пользователь не найден!');
       }
     })
     .catch(next);

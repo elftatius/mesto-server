@@ -15,12 +15,12 @@ const cardSchema = new mongoose.Schema({
       validator(v) {
         return urlRegex.test(v);
       },
-      message: 'Формат ссылки указан не правильно!',
+      message: 'Формат ссылки указан не правильно.',
     },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    ref: 'User',
     required: true,
   },
   likes: [{

@@ -13,6 +13,10 @@ Domain: https://elftatius-mesto.students.nomoreparties.co
 This work is devoted to creating your own server for the MESTO project. It is also a credit work 12 for Yandex.Practicum. The following technologies are used: node.js, editorconfig, eslint, express.js.
 
 ## How to run
+
+You must have MongoDB 5+ installed. Also use Node.js 13+ version.
+
 ```bash
+  npm install
   npm run start
 ```

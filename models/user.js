@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
       validator(v) {
         return strValidator.isEmail(v);
       },
-      message: 'Это не email!',
+      message: 'Это не email',
     },
   },
   password: {
@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
       validator(v) {
         return urlRegex.test(v);
       },
-      message: 'Не верный url для аватара!',
+      message: 'Неверный url для аватара',
     },
   },
 });
